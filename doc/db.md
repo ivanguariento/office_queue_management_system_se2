@@ -23,8 +23,6 @@ classDiagram
         string description
     }
     
-
-
     class Ticket {
         int ticket_id
         string ticket_code
@@ -92,3 +90,23 @@ erDiagram
     }
 
 ```
+# Configuration PostGreSQL + Prisma 
+
+#### 1. Start Database with Docker
+```
+docker-compose up -d
+```
+#### 2. Generate Prisma Client
+```
+npx prisma generate
+```
+
+#### 3. Apply migrations
+```
+npx prisma migrate dev --name init
+```
+#### 2. View tables of Database
+```
+npx prisma studio
+```
+- `http://localhost:5555`.
