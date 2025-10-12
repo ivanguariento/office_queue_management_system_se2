@@ -3,6 +3,7 @@ import { getAllServices } from "../controllers/serviceController";
 
 const router = Router();
 
+//GET /api/services
 router.get("", async (req, res, next) => {
      try {
       res.status(200).json(await getAllServices());
