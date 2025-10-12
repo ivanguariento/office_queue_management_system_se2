@@ -18,6 +18,12 @@ export function clear_queue(serviceTypeId: string): void {
   queues.delete(serviceTypeId);
 }
 
+export function get_queue_length(serviceTypeId: string): number {
+  const q = queues.get(serviceTypeId);
+  if (!q) return 0;
+  return q.length;
+}
+
 export default {
   add_to_queue,
   clear_queue,
