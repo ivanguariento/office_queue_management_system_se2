@@ -4,10 +4,8 @@
 
 ``` mermaid
 classDiagram
-
     Counter "*" --> "1..*" ServiceType : handles
     Counter "1" --> "*" ServedTicket : serves
-    QueueService "1" --> "*" Ticket : contains
     ServiceType "1" --> "*" Ticket : requested_by
     Ticket "1" --> "0..1" ServedTicket : fulfilled_by
 
@@ -23,22 +21,12 @@ classDiagram
         string description
     }
     
-
-
     class Ticket {
         int ticket_id
         string ticket_code
-        string status "Open Close TODO: discuss"
         datetime issued_at
         int service_id
     }
-
-    %% class QueueService {
-    %%     int service_id
-    %%     int ticket_id
-    %%     int queue_length
-    %%     datetime last_updated
-    %% }"
 
     class ServedTicket {
         int served_ticket_id
@@ -90,5 +78,25 @@ erDiagram
         datetime served_at
         datetime ended_at
     }
-
 ```
+
+## Configuration PostGreSQL + Prisma
+
+#### 1. Start Database with Docker
+```
+docker-compose up -d
+```
+#### 2. Generate Prisma Client
+```
+npx prisma generate
+```
+
+#### 3. Apply migrations
+```
+npx prisma migrate dev --name init
+```
+#### 2. View tables of Database
+```
+npx prisma studio
+```
+- `http://localhost:5555`.

@@ -1,0 +1,56 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Counter {
+  counter_id     String           @id @default(uuid()) @db.Uuid
+  counter_number Int              @unique
+  CounterService CounterService[]
+  ServedTicket   ServedTicket[]
+}
+
+model CounterService {
+  counter_service_id String @id @default(uuid()) @db.Uuid
+  counter_id         String @db.Uuid
+  service_id         String @db.Uuid
+
+  counter     Counter     @relation(fields: [counter_id], references: [counter_id], onDelete: Cascade)
+  serviceType ServiceType @relation(fields: [service_id], references: [service_id], onDelete: Cascade)
+
+  @@unique([counter_id, service_id])
+}
+
+model ServiceType {
+  service_id           String           @id @default(uuid()) @db.Uuid
+  tag_name             String           @unique
+  average_service_time Int
+  description          String?
+  CounterService       CounterService[]
+  Ticket               Ticket[]
+}
+
+model Ticket {
+  ticket_id   String   @id @default(uuid()) @db.Uuid
+  ticket_code String
+  issued_at   DateTime @default(now())
+  service_id  String   @db.Uuid
+
+  serviceType  ServiceType    @relation(fields: [service_id], references: [service_id], onDelete: Cascade)
+  ServedTicket ServedTicket[]
+}
+
+model ServedTicket {
+  served_ticket_id String    @id @default(uuid()) @db.Uuid
+  ticket_id        String    @db.Uuid
+  counter_id       String    @db.Uuid
+  served_at        DateTime  @default(now())
+  ended_at         DateTime?
+
+  ticket  Ticket  @relation(fields: [ticket_id], references: [ticket_id], onDelete: Cascade)
+  counter Counter @relation(fields: [counter_id], references: [counter_id], onDelete: Cascade)
+}
