@@ -25,7 +25,7 @@ private prisma = new PrismaClient()
       data: { ticket_code: ticketCode, service_id: service.service_id },
     });
 
-    // aggiungi il ticket alla coda del relativo serviceType (crea la coda se non esiste)
+    // add the ticket to the queue of the serviceType (create the queue if it doesn't exist)
     add_to_queue(service.service_id, created);
 
     return created;

@@ -10,7 +10,6 @@ export function add_to_queue(serviceTypeId: string, ticket: Ticket) {
     queues.set(serviceTypeId, q);
   }
   q.push(ticket);
-  console.log("queue:", queues.get(serviceTypeId));
   return;
 }
 
