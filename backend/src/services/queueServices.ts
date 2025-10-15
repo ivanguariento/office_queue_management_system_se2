@@ -23,7 +23,25 @@ export function get_queue_length(serviceTypeId: string): number {
   return q.length;
 }
 
+/**
+ * Take a Ticket from the queue for a service
+ * @param serviceTypeId
+ * @returns a ticket if find
+ */
+export function take_from_queue(serviceTypeId: string): Ticket | undefined {
+  const q = queues.get(serviceTypeId);
+  
+  if(!q || q.length === 0) {
+    return undefined;
+  }
+
+  const next = q.shift();
+
+  return next;
+}
+
 export default {
   add_to_queue,
   clear_queue,
+  take_from_queue
 };
