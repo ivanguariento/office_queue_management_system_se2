@@ -1,42 +1,90 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Mail, Package, DollarSign, ClipboardCheck, CheckCircle } from "lucide-react";
+import {
+  Mail,
+  Package,
+  DollarSign,
+  ClipboardCheck,
+  CheckCircle,
+} from "lucide-react";
+
+import API from "../services/API.mjs";
 
 export default function TicketPage() {
   const [ticket, setTicket] = useState(null);
+  const [services, setServices] = useState([]);
 
-  const services = [
-    {
-      id: 1,
-      icon: <Mail className="w-10 h-10 text-blue-600" />,
-      name: "Mail & Delivery",
-      desc: "Send or receive packages quickly and securely.",
-    },
-    {
-      id: 2,
-      icon: <DollarSign className="w-10 h-10 text-blue-600" />,
-      name: "Payments & Accounts",
-      desc: "Manage deposits, bills, or account inquiries.",
-    },
-    {
-      id: 3,
-      icon: <ClipboardCheck className="w-10 h-10 text-blue-600" />,
-      name: "Information & Support",
-      desc: "Ask questions and get help from our staff.",
-    },
-  ];
+  useEffect(() => {
+    async function fetchServices() {
+      try {
+        // const services = await API.getServices();
+        // setServices(services);
 
-  const handleGetTicket = (service) => {
-    const ticketCode = `${service.name[0]}${Math.floor(100 + Math.random() * 900)}`;
-    setTicket({ code: ticketCode, service: service.name });
+        // Simulate fetching services
+        // /*
+        setServices([
+          {
+            id: 1,
+            icon: <Mail className="w-10 h-10 text-blue-600" />,
+            name: "Mail & Delivery",
+            description: "Send or receive packages quickly and securely.",
+          },
+          {
+            id: 2,
+            icon: <DollarSign className="w-10 h-10 text-blue-600" />,
+            name: "Payments & Accounts",
+            description: "Manage deposits, bills, or account inquiries.",
+          },
+          {
+            id: 3,
+            icon: <ClipboardCheck className="w-10 h-10 text-blue-600" />,
+            name: "Information & Support",
+            description: "Ask questions and get help from our staff.",
+          },
+        ]);
+        // */
+      } catch (err) {
+        console.debug(`Error fetching services:`, err);
+      }
+    }
+
+    if (services.length === 0) {
+      fetchServices();
+    }
+  }, []);
+
+  const handleGetTicket = async (service) => {
+    try {
+      /*
+      const ticket = await API.createTicket({ serviceTypeId: service.id });
+      setTicket(ticket);
+      */
+
+      // Simulate ticket generation
+      const ticketCode = `${service.name[0]}${Math.floor(
+        100 + Math.random() * 900
+      )}`;
+      setTicket({
+        id: Math.floor(1000 + Math.random() * 9000),
+        code: ticketCode,
+        issuedAt: new Date().toISOString(),
+        serviceId: service.id,
+      });
+    } catch (err) {
+      console.debug(`Error fetching counter ${service.name}:`, err);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white text-slate-800 flex flex-col">
       {/* Header */}
       <header className="text-center py-10 border-b border-blue-100">
-        <h1 className="text-4xl font-bold text-blue-700 mb-2">Get Your Ticket</h1>
-        <p className="text-slate-600">Select a service to get your queue number</p>
+        <h1 className="text-4xl font-bold text-blue-700 mb-2">
+          Get Your Ticket
+        </h1>
+        <p className="text-slate-600">
+          Select a service to get your queue number
+        </p>
       </header>
 
       {/* Main content */}
@@ -51,7 +99,9 @@ export default function TicketPage() {
             >
               {service.icon}
               <h3 className="text-xl font-semibold mt-4">{service.name}</h3>
-              <p className="text-slate-600 text-sm mt-2 mb-4">{service.desc}</p>
+              <p className="text-slate-600 text-sm mt-2 mb-4">
+                {service.description}
+              </p>
               <button
                 onClick={() => handleGetTicket(service)}
                 className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg px-5 py-2 transition"
@@ -72,9 +122,15 @@ export default function TicketPage() {
         >
           <div className="bg-white rounded-2xl shadow-xl p-8 text-center max-w-sm">
             <CheckCircle className="w-14 h-14 text-green-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-blue-700 mb-2">Ticket Issued!</h2>
+            <h2 className="text-2xl font-bold text-blue-700 mb-2">
+              Ticket Issued!
+            </h2>
             <p className="text-slate-600 mb-4">
-              You selected <span className="font-semibold">{ticket.service}</span>
+              You selected{" "}
+              <span className="font-semibold">
+                {ticket &&
+                  services.find((s) => s.id === ticket.serviceId)?.name}
+              </span>
             </p>
             <div className="bg-blue-50 border border-blue-200 text-blue-800 text-3xl font-bold rounded-xl py-3 mb-6">
               {ticket.code}
