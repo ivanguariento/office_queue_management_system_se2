@@ -16,12 +16,37 @@ describe('GET /api/v1/services', () => {
     expect(Array.isArray(res.body)).toBe(true);
     expect(res.body.length).toBeGreaterThan(0);
   });
+
+  it('handles errors from getAllServices controller', async () => {
+    const serviceController = require('../../../src/controllers/serviceController');
+    const getAllServicesSpy = jest.spyOn(serviceController, 'getAllServices')
+      .mockRejectedValueOnce(new Error('Database error'));
+
+    const res = await request(app).get('/api/v1/services').expect(500);
+    expect(res.body).toHaveProperty('message', 'Database error');
+    expect(res.body).toHaveProperty('code', 500);
+    expect(res.body).toHaveProperty('name', 'InternalServerError');
+    
+    getAllServicesSpy.mockRestore();
+  });
 });
 
 describe('GET /api/v1/services/:serviceTypeId', () => {
   it('returns 200 and number for queue length', async () => {
     const res = await request(app).get('/api/v1/services/s1').expect(200);
-    // queueServices.get_queue_length returns a number; controller returns that value
     expect(typeof res.body === 'number' || typeof res.body === 'object').toBeTruthy();
+  });
+
+  it('handles errors from getQueueLength controller', async () => {
+    const serviceController = require('../../../src/controllers/serviceController');
+    const getQueueLengthSpy = jest.spyOn(serviceController, 'getQueueLength')
+      .mockRejectedValueOnce(new Error('Queue service error'));
+
+    const res = await request(app).get('/api/v1/services/s1').expect(500);
+    expect(res.body).toHaveProperty('message', 'Queue service error');
+    expect(res.body).toHaveProperty('code', 500);
+    expect(res.body).toHaveProperty('name', 'InternalServerError');
+    
+    getQueueLengthSpy.mockRestore();
   });
 });

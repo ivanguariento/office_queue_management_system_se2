@@ -39,4 +39,13 @@ describe('serviceController', () => {
 
     await expect(getQueueLength('notfound')).rejects.toThrow('Service not found');
   });
+
+  it('getServiceById throws when service not found', async () => {
+    const svcModule = require('../../../src/repositories/serviceRepository');
+    svcModule.serviceRepository.mockImplementation(() => ({ 
+      getServiceById: jest.fn(() => Promise.resolve(null)) 
+    }));
+
+    await expect(getServiceById('notfound')).rejects.toThrow('Service not found');
+  });
 });
