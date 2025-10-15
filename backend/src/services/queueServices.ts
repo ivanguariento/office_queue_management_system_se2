@@ -1,4 +1,5 @@
 import type { Ticket } from '@prisma/client';
+import { EventEmitter } from 'events';
 
 // In-memory map: serviceTypeId -> queue (array FIFO)
 const queues = new Map<string, Ticket[]>();
@@ -10,6 +11,8 @@ export function add_to_queue(serviceTypeId: string, ticket: Ticket) {
     queues.set(serviceTypeId, q);
   }
   q.push(ticket);
+  // emit queue update
+  emitter.emit('queue_updated', { serviceId: serviceTypeId, length: q.length });
   return;
 }
 
@@ -36,6 +39,9 @@ export function take_from_queue(serviceTypeId: string): Ticket | undefined {
   }
 
   const next = q.shift();
+  // emit queue update and ticket_called
+  emitter.emit('queue_updated', { serviceId: serviceTypeId, length: q.length });
+  if (next) emitter.emit('ticket_called', { serviceId: serviceTypeId, ticket: next });
 
   return next;
 }
@@ -45,3 +51,6 @@ export default {
   clear_queue,
   take_from_queue
 };
+
+// EventEmitter for signals (queue updates, ticket called)
+export const emitter = new EventEmitter();
