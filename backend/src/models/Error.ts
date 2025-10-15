@@ -1,4 +1,4 @@
-import { removeNullAttributes } from "utils";
+import { removeNullAttributes } from "@utils";
 
 export interface Error {
   /**

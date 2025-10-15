@@ -9,7 +9,7 @@
     "dev": "nodemon -r tsconfig-paths/register --exec ts-node src/index.ts",
     "debug-unix": "nodemon -r tsconfig-paths/register --exec 'node --inspect-brk -r ts-node/register' ./src/index.ts",
     "debug-win": "nodemon -r tsconfig-paths/register --exec \"node --inspect-brk -r ts-node/register\" ./src/index.ts",
-    "test": "jest --coverage"
+    "test": "jest --runInBand --detectOpenHandles --coverage"
   },
   "keywords": [],
   "author": "",

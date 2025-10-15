@@ -10,17 +10,17 @@ jest.mock('../../../src/repositories/serviceRepository', () => {
   };
 });
 
-describe('GET /api/services', () => {
+describe('GET /api/v1/services', () => {
   it('returns 200 with list of services', async () => {
-    const res = await request(app).get('/api/services').expect(200);
+    const res = await request(app).get('/api/v1/services').expect(200);
     expect(Array.isArray(res.body)).toBe(true);
     expect(res.body.length).toBeGreaterThan(0);
   });
 });
 
-describe('GET /api/services/:serviceTypeId', () => {
+describe('GET /api/v1/services/:serviceTypeId', () => {
   it('returns 200 and number for queue length', async () => {
-    const res = await request(app).get('/api/services/s1').expect(200);
+    const res = await request(app).get('/api/v1/services/s1').expect(200);
     // queueServices.get_queue_length returns a number; controller returns that value
     expect(typeof res.body === 'number' || typeof res.body === 'object').toBeTruthy();
   });

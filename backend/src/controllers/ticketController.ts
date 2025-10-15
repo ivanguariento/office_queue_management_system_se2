@@ -1,11 +1,11 @@
 import { Ticket, createTicketDTO } from "@models/Ticket";
-import { TicketRepository } from "@repositories/ticketRepositories";
+import { ticketRepository } from "@repositories/ticketRepository";
 
 import { logInfo } from "@services/loggingService";
 
 export async function getTicket(ticketId: string): Promise<Ticket> {
-  const ticketRepository = new TicketRepository();
-  const ticket = await ticketRepository.getTicketById(ticketId);
+  const ticketRepo = new ticketRepository();
+  const ticket = await ticketRepo.getTicketById(ticketId);
 
   return createTicketDTO(
     ticket.ticket_id,
@@ -16,8 +16,8 @@ export async function getTicket(ticketId: string): Promise<Ticket> {
 }
 
 export async function nextTicket(counterId: string): Promise<Ticket> {
-  const ticketRepository = new TicketRepository();
-  const ticket = await ticketRepository.getNextTicketForCounter(counterId);
+  const ticketRepo = new ticketRepository();
+  const ticket = await ticketRepo.getNextTicketForCounter(counterId);
 
   return createTicketDTO(
     ticket.ticket_id,
@@ -29,7 +29,6 @@ export async function nextTicket(counterId: string): Promise<Ticket> {
 import { TicketDTO, toTicketDTO } from "../dto/Ticket";
 import { NotFoundError } from "../errors/NotFoundError";
 import { serviceRepository } from "../repositories/serviceRepository";
-import { ticketRepository } from "../repositories/ticketRepository";
 
 export async function createTicket(serviceTypeId: string): Promise<TicketDTO> {
   const ticketRepo = new ticketRepository();

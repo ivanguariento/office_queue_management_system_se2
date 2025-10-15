@@ -18,10 +18,10 @@ jest.mock('../../../src/repositories/ticketRepository', () => {
   };
 });
 
-describe('POST /api/tickets/new', () => {
+describe('POST /api/v1/tickets/new', () => {
   it('returns 200 and created ticket when service exists', async () => {
     const res = await request(app)
-      .post('/api/tickets/new')
+      .post('/api/v1/tickets/new')
       .send({ serviceTypeId: 's1' })
       .expect(200);
 
@@ -36,7 +36,7 @@ describe('POST /api/tickets/new', () => {
   svcModule.serviceRepository.mockImplementation(() => ({ getServiceById: jest.fn(() => Promise.resolve(null)) }));
 
     const res = await request(app)
-      .post('/api/tickets/new')
+      .post('/api/v1/tickets/new')
       .send({ serviceTypeId: 'not_found' });
 
     // controller throws; Express error handler not defined so request will 500
