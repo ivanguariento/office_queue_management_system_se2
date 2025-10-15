@@ -1,8 +1,11 @@
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Users, Clock, BarChart3 } from "lucide-react";
 import heroImg from "../assets/hero.png";
 
 export default function LandingPage() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white text-slate-800">
       {/* Navbar */}
@@ -10,7 +13,10 @@ export default function LandingPage() {
         <h1 className="text-2xl font-bold text-blue-700">
           Office Queue Management
         </h1>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl px-5 py-2 transition">
+        <button
+          onClick={() => navigate("/role")}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl px-5 py-2 transition"
+        >
           Get Started
         </button>
       </nav>
