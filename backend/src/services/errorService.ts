@@ -1,12 +1,19 @@
-import { ErrorDTO } from "../dto/ErrorDTO";
-import { AppError } from "../errors/AppError";
-import { createErrorDTO } from "../dto/ErrorDTO";
+import { Error, createErrorDTO } from "@models/Error";
+import { AppError } from "@errors/AppError";
+import { logError } from "@services/loggingService";
 
-export function createAppError(err: any): ErrorDTO {
-  let modelError: ErrorDTO = createErrorDTO(
+export function createAppError(err: any): Error {
+  let modelError: Error = createErrorDTO(
     500,
     err?.message || "Internal Server Error",
     "InternalServerError"
+  );
+
+  logError(err);
+  logError(
+    `Error: ${err?.message}\nStacktrace:\n${
+      err?.stack || "No stacktrace available"
+    }`
   );
 
   if (
@@ -18,5 +25,3 @@ export function createAppError(err: any): ErrorDTO {
 
   return modelError;
 }
-
-

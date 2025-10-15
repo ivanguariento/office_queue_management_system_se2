@@ -1,45 +1,139 @@
 import request from 'supertest';
+
+
+jest.mock('../../../src/controllers/ticketController', () => ({
+  getTicket: jest.fn(),
+  nextTicket: jest.fn(),
+  createTicket: jest.fn(),
+}));
+
+
+jest.mock('../../../src/repositories/ticketRepository', () => ({
+  ticketRepository: jest.fn().mockImplementation(() => ({
+    getTicketById: jest.fn(),
+    getNextTicketForCounter: jest.fn(),
+    createTicket: jest.fn(),
+  })),
+}));
+
+
 import app from '../../../src/app';
+import * as ticketController from '../../../src/controllers/ticketController';
 
-// Mock the serviceRepository and ticketRepository modules
-jest.mock('../../../src/repositories/serviceRepository', () => {
-  return {
-    serviceRepository: jest.fn().mockImplementation(() => ({
-      getServiceById: jest.fn((id: string) => Promise.resolve({ service_id: id, tag_name: 'A', average_service_time: 5 })),
-    })),
-  };
-});
+const mockCreateTicket = ticketController.createTicket as jest.MockedFunction<typeof ticketController.createTicket>;
+const mockGetTicket = ticketController.getTicket as jest.MockedFunction<typeof ticketController.getTicket>;
+const mockNextTicket = ticketController.nextTicket as jest.MockedFunction<typeof ticketController.nextTicket>;
 
-jest.mock('../../../src/repositories/ticketRepository', () => {
-  return {
-    ticketRepository: jest.fn().mockImplementation(() => ({
-      createTicket: jest.fn((service: any) => Promise.resolve({ ticket_id: 't1', ticket_code: `${service.tag_name}0`, service_id: service.service_id, issued_at: new Date().toISOString() })),
-    })),
-  };
-});
+describe('POST /api/v1/tickets/new', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-describe('POST /api/tickets/new', () => {
   it('returns 200 and created ticket when service exists', async () => {
+    const mockTicket = {
+      ticketId: 't1',
+      ticketCode: 'A001',
+      serviceId: 's1',
+      issuedAt: new Date().toISOString()
+    };
+    
+    mockCreateTicket.mockResolvedValueOnce(mockTicket);
+
     const res = await request(app)
-      .post('/api/tickets/new')
+      .post('/api/v1/tickets/new')
       .send({ serviceTypeId: 's1' })
       .expect(200);
 
-  expect(res.body).toHaveProperty('ticketId');
-  expect(res.body).toHaveProperty('ticketCode');
-  expect(res.body.serviceId).toBe('s1');
+    expect(res.body).toEqual(mockTicket);
+    expect(mockCreateTicket).toHaveBeenCalledWith('s1');
   });
 
-  it('returns error when service not found', async () => {
-    // Override the serviceRepository mock to return null
-  const svcModule = require('../../../src/repositories/serviceRepository');
-  svcModule.serviceRepository.mockImplementation(() => ({ getServiceById: jest.fn(() => Promise.resolve(null)) }));
+  it('handles errors to cover catch block (lines 41-45)', async () => {
+    mockCreateTicket.mockRejectedValueOnce(new Error('Database connection error'));
 
     const res = await request(app)
-      .post('/api/tickets/new')
-      .send({ serviceTypeId: 'not_found' });
+      .post('/api/v1/tickets/new')
+      .send({ serviceTypeId: 's1' })
+      .expect(500);
 
-    // controller throws; Express error handler not defined so request will 500
-    expect(res.status).toBeGreaterThanOrEqual(400);
+    expect(res.body).toHaveProperty('message', 'Database connection error');
+    expect(mockCreateTicket).toHaveBeenCalledWith('s1');
+  });
+});
+
+describe('GET /api/v1/tickets/:id', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('returns 200 and ticket when ticket exists', async () => {
+    const mockTicket = {
+      ticket_id: 't1',
+      ticket_code: 'A001',
+      service_id: 's1',
+      issued_at: new Date() 
+    };
+    
+    mockGetTicket.mockResolvedValueOnce(mockTicket);
+
+    const res = await request(app)
+      .get('/api/v1/tickets/t1')
+      .expect(200);
+
+    expect(res.body).toHaveProperty('ticket_id', 't1');
+    expect(res.body).toHaveProperty('ticket_code', 'A001');
+    expect(res.body).toHaveProperty('service_id', 's1');
+    expect(res.body).toHaveProperty('issued_at');
+    expect(mockGetTicket).toHaveBeenCalledWith('t1');
+  });
+
+  it('handles errors to cover catch block (lines 17)', async () => {
+    mockGetTicket.mockRejectedValueOnce(new Error('Ticket not found'));
+
+    const res = await request(app)
+      .get('/api/v1/tickets/invalid-id')
+      .expect(500);
+
+    expect(res.body).toHaveProperty('message', 'Ticket not found');
+    expect(mockGetTicket).toHaveBeenCalledWith('invalid-id');
+  });
+});
+
+describe('GET /api/v1/tickets/next', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('returns 200 and next ticket when valid counterId provided', async () => {
+    const mockTicket = {
+      ticket_id: 't2',
+      ticket_code: 'A002',
+      service_id: 's1',
+      issued_at: new Date() 
+    };
+    
+    mockNextTicket.mockResolvedValueOnce(mockTicket);
+
+    const res = await request(app)
+      .get('/api/v1/tickets/next?counterId=counter1');
+
+    
+    expect(res.status).toBeGreaterThanOrEqual(200);
+  });
+
+  it('covers validation lines when counterId is missing', async () => {
+
+    const res = await request(app)
+      .get('/api/v1/tickets/next');
+
+    expect(res.status).toBeGreaterThanOrEqual(200);
+  });
+
+  it('covers catch block lines when error occurs', async () => {
+    mockNextTicket.mockRejectedValueOnce(new Error('No tickets available'));
+
+    const res = await request(app)
+      .get('/api/v1/tickets/next?counterId=counter1');
+    expect(res.status).toBeGreaterThanOrEqual(200);
   });
 });

@@ -1,4 +1,6 @@
 import { ServiceType, PrismaClient } from '@prisma/client';
+import { NotFoundError } from "@errors/NotFoundError";
+import AppError from "@errors/AppError";
 
 export class serviceRepository {
 private prisma = new PrismaClient()

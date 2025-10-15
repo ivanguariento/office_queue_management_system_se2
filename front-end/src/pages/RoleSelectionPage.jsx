@@ -11,14 +11,14 @@ export default function RoleSelectionPage() {
       icon: <User className="w-12 h-12 text-blue-600" />,
       name: "Customer",
       desc: "Get a queue ticket and wait for your turn.",
-      path: "/get-ticket",
+      path: "/ticket",
     },
     {
       id: 2,
       icon: <Briefcase className="w-12 h-12 text-blue-600" />,
       name: "Officer",
       desc: "Manage counters and serve waiting customers.",
-      path: "/counter",
+      path: "/counter/1", // TEMP: Default to counter 1 for demo purposes
     },
     {
       id: 3,
