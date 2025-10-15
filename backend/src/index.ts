@@ -3,10 +3,9 @@ import { CONFIG } from "@config";
 import { logError, logInfo } from "@services/loggingService";
 import { closeDatabase, initializeDatabase } from "@database";
 import { Server } from "http";
-import WebSocket, { WebSocketServer } from 'ws';
 
 let server: Server;
-let wss: WebSocketServer | undefined;
+let wss: any | undefined;
 
 async function startServer() {
   try {
@@ -15,36 +14,34 @@ async function startServer() {
       logInfo(`Server started on http://${CONFIG.APP_HOST}:${CONFIG.APP_PORT}`);
     });
 
-    // attach WebSocket server to the same HTTP server
-    wss = new WebSocketServer({ server });
+    // attempt to load ws dynamically; if not installed, skip WebSocket setup
+    try {
+      // require instead of import to avoid TS type-check errors when ws not installed
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const ws = require('ws');
+      const WebSocketServer = ws.WebSocketServer || ws.Server;
+      wss = new WebSocketServer({ server });
 
-    // forward events from queueServices.emitter to connected websocket clients
-    const qs = await import("./services/queueServices");
-    qs.emitter.on('queue_updated', (payload: any) => {
-      const msg = JSON.stringify({ type: 'queue_updated', payload });
-      wss!.clients.forEach((c: WebSocket) => {
-        if (c.readyState === WebSocket.OPEN) c.send(msg);
+      // forward events from queueServices.emitter to connected websocket clients
+      const qs = await import("./services/queueServices");
+      const broadcast = (type: string, payload: any) => {
+        const msg = JSON.stringify({ type, payload });
+        wss.clients.forEach((c: any) => {
+          if (c.readyState === c.OPEN) c.send(msg);
+        });
+      };
+
+      qs.emitter.on('queue_updated', (payload: any) => broadcast('queue_updated', payload));
+      qs.emitter.on('ticket_called', (payload: any) => broadcast('ticket_called', payload));
+      qs.emitter.on('ticket_served', (payload: any) => broadcast('ticket_served', payload));
+
+      wss.on('connection', (socket: any) => {
+        logInfo('WebSocket client connected');
+        socket.on('close', () => logInfo('WebSocket client disconnected'));
       });
-    });
-
-    qs.emitter.on('ticket_called', (payload: any) => {
-      const msg = JSON.stringify({ type: 'ticket_called', payload });
-      wss!.clients.forEach((c: WebSocket) => {
-        if (c.readyState === WebSocket.OPEN) c.send(msg);
-      });
-    });
-
-    qs.emitter.on('ticket_served', (payload: any) => {
-      const msg = JSON.stringify({ type: 'ticket_served', payload });
-      wss!.clients.forEach((c: WebSocket) => {
-        if (c.readyState === WebSocket.OPEN) c.send(msg);
-      });
-    });
-
-    wss.on('connection', (socket: WebSocket) => {
-      logInfo('WebSocket client connected');
-      socket.on('close', () => logInfo('WebSocket client disconnected'));
-    });
+    } catch (err) {
+      logInfo('ws module not available; WebSocket server not started');
+    }
 
   } catch (error) {
     logError("Error in app initialization:", error);
