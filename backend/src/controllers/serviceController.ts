@@ -5,6 +5,7 @@ import { get_queue_length } from "../services/queueServices";
 
 export async function getAllServices(): Promise<ServiceDTO[]> {
     const serviceRepo = new serviceRepository();
+    console.log("Fetching all services");
     return (await serviceRepo.getAllServices()).map(toServiceDTO);
 }
 

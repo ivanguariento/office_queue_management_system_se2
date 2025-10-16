@@ -16,30 +16,14 @@ export default function TicketPage() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
-
+console.log(ticket)
   useEffect(() => {
     (async () => {
       try {
         setErr(null);
-        // const list = await API.getServices(); // [{ service_id, tag_name, description, ... }]
-        // setServices(list);
-        setServices([
-          {
-            service_id: 1,
-            tag_name: "Mail & Delivery",
-            description: "Send or receive packages quickly and securely.",
-          },
-          {
-            service_id: 2,
-            tag_name: "Payments & Accounts",
-            description: "Manage deposits, bills, or account inquiries.",
-          },
-          {
-            service_id: 3,
-            tag_name: "Information & Support",
-            description: "Ask questions and get help from our staff.",
-          },
-        ]);
+        const list = await API.getServices(); // [{ service_id, tag_name, description, ... }]
+        setServices(list);
+
       } catch (e) {
         setErr(
           e?.response?.data?.message || e?.message || "Failed to load services"
@@ -52,13 +36,13 @@ export default function TicketPage() {
     try {
       setLoading(true);
       setErr(null);
-      const created = await API.createTicket(service.service_id); // serviceTypeId
+      const created = await API.createTicket(service?.serviceId); // serviceTypeId
 
       setTicket({
-        id: created.ticket_id,
-        code: created.ticket_code,
-        issuedAt: created.issued_at,
-        serviceId: created.service_id,
+        id: created.ticketId,
+        code: created.ticketCode,
+        issuedAt: created.issueAt,
+        serviceId: created.serviceId,
       });
     } catch (e) {
       setErr(
@@ -85,7 +69,7 @@ export default function TicketPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {services.map((service) => (
             <motion.div
-              key={service.service_id}
+              key={service.serviceId}
               whileHover={{ scale: 1.03 }}
               transition={{ type: "spring", stiffness: 200 }}
               className="bg-white rounded-2xl shadow-md p-8 flex flex-col items-center text-center hover:shadow-lg transition"
@@ -119,16 +103,15 @@ export default function TicketPage() {
               Ticket Issued!
             </h2>
             <p className="text-slate-600 mb-4">
-              You selected{" "}
-              <span className="font-semibold">
+              You selected       <span className="font-semibold">
                 {
-                  services.find((s) => s.service_id === ticket.serviceId)
-                    ?.tag_name
+                  services.find((s) => s.serviceId === ticket.serviceId)
+                    ?.tagName
                 }
               </span>
             </p>
-            <div className="bg-blue-50 border border-blue-200 text-blue-800 text-3xl font-bold rounded-xl py-3 mb-6">
-              {ticket.code}
+            <div className="bg-blue-50 border border-blue-200 text-blue-800 text-3xl font-bold rounded-xl py-3 mb-6 px-1">
+              {ticket.code ?? "N/A"}
             </div>
             <button
               onClick={() => setTicket(null)}

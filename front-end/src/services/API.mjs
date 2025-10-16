@@ -18,8 +18,9 @@ export default {
   },
   async createTicket(serviceTypeId) {
     const { data } = await http.post("/tickets/new", {     // POST /api/tickets/new
-      serviceTypeId,                                       // body { serviceTypeId: string }
+      "serviceTypeId": serviceTypeId,                                       // body { serviceTypeId: string }
     });
+    console.log(data);
     return data;                                           // created ticket
   },
   async getNextForCounter(counterId) {

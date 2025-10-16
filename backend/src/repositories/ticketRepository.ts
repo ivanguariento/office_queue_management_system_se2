@@ -31,7 +31,7 @@ private prisma = new PrismaClient()
 
     // add the ticket to the queue of the serviceType (create the queue if it doesn't exist)
     add_to_queue(service.service_id, created);
-
+    console.log(`Ticket ${created.ticket_code} added to queue of service ${service}`);
     return created;
   });
 
