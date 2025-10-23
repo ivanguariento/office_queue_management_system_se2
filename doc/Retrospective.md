@@ -29,9 +29,9 @@ sections:
 
 | Story  | # Tasks | Points | Hours est. | Hours actual |
 |--------|---------|--------|------------|--------------|
-| _Uncategorized_   |  10       |       |      30h 25m      |  23h 55m            |
-| 1      |    8     |  1      |       5h 45m     |      8h        |  
-| 2 (commited)    |    4     |  3     |       5h 45m     |      8h        |  
+| _Uncategorized_   |  10       |       |      30h 25m      |  28h 40m            |
+| 1      |    8     |  1      |       5h 45m     |      8h 15m       |  
+| 2 (commited)    |    4     |  3     |       15h     |      15h        |  
 
 > story `Uncategorized` is for technical tasks, leave out story points (not applicable in this case)
 
@@ -39,16 +39,16 @@ sections:
 
 |            | Mean | StDev |
 |------------|------|-------|
-| Estimation |      |       | 
-| Actual     |      |       |
+| Estimation |   2h 19m   |    2h 50m   | 
+| Actual     |  2h 13m    |   2h 35m    |
 
 - Total estimation error ratio: sum of total hours spent / sum of total hours effort - 1
 
-    $$\frac{\sum_i spent_{task_i}}{\sum_i estimation_{task_i}} - 1$$
+    $$\frac{\sum_i spent_{task_i}}{\sum_i estimation_{task_i}} - 1 = -0.009$$
     
 - Absolute relative task estimation error: sum( abs( spent-task-i / estimation-task-i - 1))/n
 
-    $$\frac{1}{n}\sum_i^n \left| \frac{spent_{task_i}}{estimation_task_i}-1 \right| $$
+    $$\frac{1}{n}\sum_i^n \left| \frac{spent_{task_i}}{estimation_task_i}-1 \right| = 0.245 $$
   
 ## QUALITY MEASURES 
 
@@ -71,16 +71,30 @@ sections:
 
 - What did go wrong in the sprint?
 
+  - Bad organization: several problem with Git (from branch synchronization to merge conflict)
+  - Misunderstanding of finish story meaning
+
 - What caused your errors in estimation (if any)?
+  - Lack of experience in agile methodology
+  - First time working together
 
 - What lessons did you learn (both positive and negative) in this sprint?
+  - To correctly split the work (e.g. Git)
+  - To assign the correct time for each task
 
 - Which improvement goals set in the previous retrospective were you able to achieve? 
+  -No previous retrospective
   
 - Which ones you were not able to achieve? Why?
+  -No previous retrospective
 
 - Improvement goals for the next sprint and how to achieve them (technical tasks, team coordination, etc.)
 
-  > Propose one or two
+  > Improve team organization: task assignment, more verbose task definition, increase the scrum meetings, more team communication
+  >Improve Git usage and project skeleton definition
 
 - One thing you are proud of as a Team!!
+
+  >We all like gianduiotti
+  >We are nice and funny to each other
+  >We are improving our english
